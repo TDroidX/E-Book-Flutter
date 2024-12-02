@@ -13,16 +13,19 @@ class _AltaLibroPageState extends State<AltaLibroPage> {
   String autor = '';
   String fecha = '';
 
+  final tituloRegex = RegExp(r'^[a-zA-Z0-9\s]+$');
+  final autorRegex = RegExp(r'^[a-zA-Z\s]+$');
+
   Future<void> seleccionarArchivo() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'epub'], // Solo archivos PDF y EPUB
+      allowedExtensions: ['pdf', 'epub'],
     );
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
-        fileName = result.files.first.name; // Nombre del archivo
-        filePath = result.files.first.path; // Ruta del archivo
+        fileName = result.files.first.name;
+        filePath = result.files.first.path;
       });
     }
   }
@@ -35,7 +38,28 @@ class _AltaLibroPageState extends State<AltaLibroPage> {
       return;
     }
 
-    // Aquí podrías pasar los datos a la pantalla anterior o guardarlos en una base de datos
+    if (!tituloRegex.hasMatch(titulo)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("El nombre del libro solo debe contener letras, números y espacios")),
+      );
+      return;
+    }
+
+    if (!autorRegex.hasMatch(autor)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("El nombre del autor solo debe contener letras")),
+      );
+      return;
+    }
+
+    final dateRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+    if (!dateRegex.hasMatch(fecha)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("La fecha debe tener el formato: YYYY-MM-DD")),
+      );
+      return;
+    }
+
     Navigator.pop(context, {
       'titulo': titulo,
       'autor': autor,
@@ -82,7 +106,7 @@ class _AltaLibroPageState extends State<AltaLibroPage> {
             ),
             SizedBox(height: 20),
             TextField(
-              decoration: InputDecoration(labelText: "Nombre:"),
+              decoration: InputDecoration(labelText: "Nombre del libro:"),
               onChanged: (value) {
                 setState(() {
                   titulo = value;
@@ -100,8 +124,8 @@ class _AltaLibroPageState extends State<AltaLibroPage> {
             ),
             SizedBox(height: 10),
             TextField(
-              decoration: InputDecoration(labelText: "Fecha:"),
-              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: "Fecha (YYYY-MM-DD):"),
+              keyboardType: TextInputType.datetime,
               onChanged: (value) {
                 setState(() {
                   fecha = value;
