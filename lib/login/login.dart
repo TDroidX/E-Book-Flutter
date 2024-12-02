@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../registro/registro.dart';  // Importa el archivo de registro
+import 'package:shared_preferences/shared_preferences.dart';
+import '../libros/librosDoc.dart'; // Importa el archivo librosDoc
+import '../registro/registro.dart'; // Importa el archivo de registro
 
 void main() => runApp(MiApp());
 
@@ -22,15 +24,29 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Variables para los controladores de los campos de texto
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
-
-  // Variable para controlar si la contraseña está visible
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
 
-  // Clave global para el formulario
-  final _formKey = GlobalKey<FormState>();
+  // Función para validar las credenciales del usuario
+  Future<void> _login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedName = prefs.getString('name');
+    String? savedPassword = prefs.getString('password');
+
+    if (_usuarioController.text == savedName &&
+        _contrasenaController.text == savedPassword) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LibrosDocPage()), // Navegar a librosDoc
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Usuario o contraseña incorrectos')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,80 +55,48 @@ class _LoginPageState extends State<LoginPage> {
         title: Text("LOGIN"),
         backgroundColor: Color.fromARGB(255, 53, 92, 125),
         actions: [
-          // Aquí agregamos el botón para ir a la página de registro
           TextButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RegisterPage()),  // Navegar a la pantalla de registro
+                MaterialPageRoute(builder: (context) => RegisterPage()), // Navegar a registro
               );
             },
             child: const Text(
               'Registrarse',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           )
         ],
       ),
-      backgroundColor: const Color.fromARGB(255, 53, 92, 125), // Fondo negro
+      backgroundColor: const Color.fromARGB(255, 53, 92, 125),
       body: Center(
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 192, 122, 60), // Fondo naranja del contenedor
+            color: Color.fromARGB(255, 192, 122, 60),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Form(
-            key: _formKey, // Asignamos la clave al formulario
+            key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'LOGIN',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF223B59), // Azul oscuro del título
-                    ),
-                  ),
+                Text(
+                  'LOGIN',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF223B59)),
                 ),
                 SizedBox(height: 16),
-                // Usamos CustomPaint para dibujar el polígono
-                Container(
-                  height: 80,
-                  width: 80,
-                  child: CustomPaint(
-                    painter: PolygonPainter(),
-                    child: Center(
-                      child: Icon(
-                        Icons.person,
-                        size: 60,
-                        color: Color(0xFF223B59), // Azul oscuro del ícono
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 32),
+                // Campo Usuario
                 TextFormField(
                   controller: _usuarioController,
                   decoration: InputDecoration(
                     labelText: 'Usuario',
                     filled: true,
                     fillColor: Colors.white,
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: Color(0xFF223B59),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    prefixIcon: Icon(Icons.person, color: Color(0xFF223B59)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -122,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 SizedBox(height: 16),
-                // Campo de Contraseña con funcionalidad de ver/ocultar
+                // Campo Contraseña
                 TextFormField(
                   controller: _contrasenaController,
                   obscureText: _obscureText,
@@ -130,22 +114,16 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: 'Contraseña',
                     filled: true,
                     fillColor: Colors.white,
-                    labelStyle: TextStyle(color: Colors.black),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.lock,
-                      color: Color(0xFF223B59),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    prefixIcon: Icon(Icons.lock, color: Color(0xFF223B59)),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        _obscureText ? Icons.visibility : Icons.visibility_off,
                         color: Colors.grey,
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscureText = !_obscureText; // Cambia el estado de visibilidad
+                          _obscureText = !_obscureText;
                         });
                       },
                     ),
@@ -157,25 +135,20 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 32),
+                // Botón Iniciar Sesión
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
-                      // Si el formulario es válido, realizamos la autenticación
-                      // Aquí puedes agregar la lógica de autenticación
+                      _login(); // Validar las credenciales
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 20, 90, 175), // Azul oscuro del botón
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    backgroundColor: Color(0xFF223B59),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(
-                    'Entrar',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: Text('Iniciar Sesión', style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),
@@ -184,28 +157,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-// CustomPainter para dibujar un polígono
-class PolygonPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    // Define los puntos del polígono
-    path.moveTo(size.width * 0.5, 0); // Vértice superior
-    path.lineTo(size.width, size.height * 0.35);
-    path.lineTo(size.width * 0.8, size.height);
-    path.lineTo(size.width * 0.2, size.height);
-    path.lineTo(0, size.height * 0.35);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
