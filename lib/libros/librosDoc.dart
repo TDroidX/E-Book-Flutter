@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../crudLibros/altaLibro.dart'; // Ruta del archivo en la carpeta crudLibros
 import '../busquedaLibros/busquedaLib.dart'; // Nueva ruta al archivo de búsqueda
+import '../perfil/perfil.dart'; // Nueva ruta al archivo de perfil
+import '../main.dart'; // Ruta al archivo principal
 
 class LibrosDocPage extends StatefulWidget {
   @override
@@ -59,10 +62,16 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
             // Lógica para manejar las opciones del menú
             switch (choice) {
               case 'Inicio':
-                print('Navegar a Inicio');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MiApp()), // Redirige a la página principal
+                );
                 break;
               case 'Perfil':
-                print('Navegar a Perfil');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PerfilPage()), // Redirige a la página de perfil
+                );
                 break;
               case 'Configuración':
                 print('Navegar a Configuración');
