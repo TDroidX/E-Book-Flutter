@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../crudLibros/altaLibro.dart'; // Ruta del archivo en la carpeta crudLibros
+import '../busquedaLibros/busquedaLib.dart'; // Nueva ruta al archivo de búsqueda
 
 class LibrosDocPage extends StatefulWidget {
   @override
@@ -9,86 +10,11 @@ class LibrosDocPage extends StatefulWidget {
 class _LibrosDocPageState extends State<LibrosDocPage> {
   List<Map<String, String>> libros = []; // Lista para almacenar los libros añadidos
   List<Map<String, String>> librosFiltrados = []; // Lista para almacenar los resultados de búsqueda
-  String query = ''; // Cadena de búsqueda
 
   @override
   void initState() {
     super.initState();
     librosFiltrados = libros; // Inicialmente, mostrar todos los libros
-  }
-
-  void buscarLibro() {
-    setState(() {
-      if (query.isEmpty) {
-        librosFiltrados = libros;
-      } else {
-        librosFiltrados = libros
-            .where((libro) => libro['titulo']!.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-
-    if (librosFiltrados.isEmpty && query.isNotEmpty) {
-      mostrarAlertaLibroNoEncontrado();
-    }
-  }
-
-  void mostrarAlertaLibroNoEncontrado() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Libro no encontrado"),
-          content: Text("No se encontró ningún libro con ese nombre o parecido."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Cerrar"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void showSearchDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Buscar libro"),
-          content: TextField(
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: "Ingresa el nombre del libro",
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) {
-              setState(() {
-                query = value;
-              });
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Cerrar"),
-            ),
-            TextButton(
-              onPressed: () {
-                buscarLibro();
-                Navigator.pop(context);
-              },
-              child: Text("Buscar"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -136,12 +62,17 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              showSearchDialog();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BusquedaLibPage(libros: libros),
+                ),
+              );
             },
           ),
         ],
       ),
-      body: librosFiltrados.isEmpty && query.isNotEmpty
+      body: librosFiltrados.isEmpty
           ? Center(
               child: Text(
                 "No se encontraron libros con ese nombre.",
