@@ -6,6 +6,7 @@ import '../perfil/perfil.dart'; // Nueva ruta al archivo de perfil
 import '.././main.dart'; 
 import '../login/login.dart';// Ruta al archivo principal
 
+
 class LibrosDocPage extends StatefulWidget {
   @override
   _LibrosDocPageState createState() => _LibrosDocPageState();
@@ -54,8 +55,8 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
   // Función para cerrar sesión
 Future<void> _cerrarSesion() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  // await prefs.remove('name'); // Eliminar el nombre de usuario
-  // await prefs.remove('password'); // Eliminar la contraseña
+  // await prefs.remove('name');
+  // await prefs.remove('password'); 
   await prefs.remove('isLoggedIn'); // Eliminar el estado de sesión
 
   // Redirigir al login

@@ -69,7 +69,7 @@ class _InicioState extends State<Inicio> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage("assets/img/fondo1.jpg"),
+          image: AssetImage("assets/img/fondo2.jpeg"),
           fit: BoxFit.cover,
         ),
       ),
