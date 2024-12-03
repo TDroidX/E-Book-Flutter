@@ -2,21 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../libros/librosDoc.dart'; // Importa el archivo librosDoc
 import '../registro/registro.dart'; // Importa el archivo de registro
-
-void main() => runApp(MiApp());
-
-class MiApp extends StatelessWidget {
-  const MiApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Mi App",
-      home: LoginPage(),
-    );
-  }
-}
+import '../main.dart'; // Importa tu archivo main.dart para acceder a la función Inicio()
 
 class LoginPage extends StatefulWidget {
   @override
@@ -37,11 +23,16 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_usuarioController.text == savedName &&
         _contrasenaController.text == savedPassword) {
+      // Guardar estado de sesión en SharedPreferences
+      await prefs.setBool('isLoggedIn', true); 
+
+      // Navegar a la página de Libros
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LibrosDocPage()), // Navegar a librosDoc
       );
     } else {
+      // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuario o contraseña incorrectos')),
       );
@@ -54,6 +45,15 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text("LOGIN"),
         backgroundColor: Color.fromARGB(255, 53, 92, 125),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => Inicio()), // Redirige a Inicio
+            );
+          },
+        ),
         actions: [
           TextButton(
             onPressed: () {

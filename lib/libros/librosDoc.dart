@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../crudLibros/altaLibro.dart'; // Ruta del archivo en la carpeta crudLibros
 import '../busquedaLibros/busquedaLib.dart'; // Nueva ruta al archivo de búsqueda
 import '../perfil/perfil.dart'; // Nueva ruta al archivo de perfil
-import '../main.dart'; // Ruta al archivo principal
+import '.././main.dart'; 
+import '../login/login.dart';// Ruta al archivo principal
 
 class LibrosDocPage extends StatefulWidget {
   @override
@@ -50,6 +51,19 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
     );
   }
 
+  // Función para cerrar sesión
+Future<void> _cerrarSesion() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove('name'); // Eliminar el nombre de usuario
+  await prefs.remove('password'); // Eliminar la contraseña
+  await prefs.remove('isLoggedIn'); // Eliminar el estado de sesión
+
+  // Redirigir al login
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginPage()), // Redirige al LoginPage
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,46 +71,53 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
         title: Text("Libros y documentos"),
         backgroundColor: Color.fromARGB(255, 53, 92, 125),
         leading: PopupMenuButton<String>(
-          icon: Icon(Icons.menu),
-          onSelected: (String choice) {
-            // Lógica para manejar las opciones del menú
-            switch (choice) {
-              case 'Inicio':
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MiApp()), // Redirige a la página principal
-                );
-                break;
-              case 'Perfil':
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PerfilPage()), // Redirige a la página de perfil
-                );
-                break;
-              case 'Configuración':
-                print('Navegar a Configuración');
-                break;
-              default:
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'Inicio',
-                child: Text('Inicio'),
-              ),
-              PopupMenuItem<String>(
-                value: 'Perfil',
-                child: Text('Perfil'),
-              ),
-              PopupMenuItem<String>(
-                value: 'Configuración',
-                child: Text('Configuración'),
-              ),
-            ];
-          },
-        ),
+  icon: Icon(Icons.menu),
+  onSelected: (String choice) {
+    switch (choice) {
+      case 'Inicio':
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Inicio()), // Me da error aqui!!
+        );
+        break;
+      case 'Perfil':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PerfilPage()), // Redirige a la página de perfil
+        );
+        break;
+      case 'Cerrar sesión':
+        _cerrarSesion(); // Llamar a la función para cerrar sesión
+        break;
+      case 'Configuración':
+        print('Navegar a Configuración');
+        break;
+      default:
+        break;
+    }
+  },
+  itemBuilder: (BuildContext context) {
+    return <PopupMenuEntry<String>>[
+      PopupMenuItem<String>(
+        value: 'Inicio',
+        child: Text('Inicio'),
+      ),
+      PopupMenuItem<String>(
+        value: 'Perfil',
+        child: Text('Perfil'),
+      ),
+      PopupMenuItem<String>(
+        value: 'Cerrar sesión',
+        child: Text('Cerrar sesión'),
+      ),
+      PopupMenuItem<String>(
+        value: 'Configuración',
+        child: Text('Configuración'),
+      ),
+    ];
+  },
+)
+,
         actions: [
           IconButton(
             icon: Icon(Icons.search),
