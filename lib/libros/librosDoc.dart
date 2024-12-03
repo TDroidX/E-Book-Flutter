@@ -54,8 +54,8 @@ class _LibrosDocPageState extends State<LibrosDocPage> {
   // Función para cerrar sesión
 Future<void> _cerrarSesion() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.remove('name'); // Eliminar el nombre de usuario
-  await prefs.remove('password'); // Eliminar la contraseña
+  // await prefs.remove('name'); // Eliminar el nombre de usuario
+  // await prefs.remove('password'); // Eliminar la contraseña
   await prefs.remove('isLoggedIn'); // Eliminar el estado de sesión
 
   // Redirigir al login
